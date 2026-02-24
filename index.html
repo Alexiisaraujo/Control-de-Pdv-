@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Condor — Gerenciador de PDV</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Flatpickr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <!-- Excel libs -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Condor — Gerenciador de PDV</h1>
+    </div>
+
+    <nav>
+      <button class="nav-btn" onclick="mostrar('principal')">Atribuição Diária</button>
+      <button class="nav-btn" onclick="mostrar('empregados')">Cadastrar Colaborador</button>
+      <button class="nav-btn" onclick="mostrar('folgas')">Folgas</button>
+      <button class="nav-btn" onclick="mostrar('domingo')">Domingos</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- CADASTRO -->
+    <section id="empregados" class="section" style="display:none;">
+      <h2>Gestão de Colaboradores</h2>
+
+      <div class="form-card">
+        <label for="empNome">Nome do colaborador</label>
+        <input id="empNome" placeholder="Ex: João Silva" />
+
+        <label for="empTipo">Tipo de funcionário</label>
+        <select id="empTipo">
+          <option value="condor">Condor</option>
+          <option value="terceirizado">Terceirizado</option>
+        </select>
+
+        <label for="empLivre">Dia de folga</label>
+        <select id="empLivre">
+          <option value="segunda">Segunda</option>
+          <option value="terca">Terça</option>
+          <option value="quarta">Quarta</option>
+          <option value="quinta">Quinta</option>
+          <option value="sexta">Sexta</option>
+          <option value="sabado">Sábado</option>
+          <option value="domingo">Domingo</option>
+        </select>
+
+        <label for="empTurno">Turno (hora de início)</label>
+        <input id="empTurno" placeholder="Clique para escolher horário" readonly />
+
+        <label for="empCategoriaDom">Categoria (Domingos)</label>
+        <select id="empCategoriaDom">
+          <option value="">— Nenhuma —</option>
+          <option value="empaquetador">Empacotador</option>
+          <option value="caja">Operador de Caixa</option>
+          <option value="fiscal">Fiscal</option>
+        </select>
+
+        <label for="empPrimeiroDom">1º domingo trabalhado (opcional)</label>
+        <input id="empPrimeiroDom" type="date" />
+
+        <div class="row">
+          <button onclick="abrirSeletorHora()">Selecionar Horário</button>
+          <button class="sec" onclick="limparFormularioEmp()">Limpar</button>
+        </div>
+
+        <div class="row">
+          <button onclick="adicionarEmpregado()">Adicionar / Atualizar Colaborador</button>
+        </div>
+      </div>
+
+      <h3>Colaboradores (separados por Manhã / Tarde)</h3>
+      <div class="split-lists">
+        <div>
+          <h4>Manhã (antes de 12:00)</h4>
+          <ul id="listaManha" class="list"></ul>
+        </div>
+        <div>
+          <h4>Tarde (12:00 em diante)</h4>
+          <ul id="listaTarde" class="list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ATRIBUIÇÃO -->
+    <section id="principal" class="section" style="display:none;">
+      <h2>Atribuição por Data</h2>
+
+      <div class="form-card">
+        <label for="data">Selecionar data</label>
+        <input id="data" type="date" />
+
+        <label for="turnoSelect">Turno</label>
+        <div class="turno-toggle">
+          <button id="btnManha" class="turno-btn active" onclick="setarTurno('manha')">Manhã</button>
+          <button id="btnTarde" class="turno-btn" onclick="setarTurno('tarde')">Tarde</button>
+        </div>
+
+        <label for="pdvNumero">Ponto de Venda (PDV)</label>
+        <select id="pdvNumero"></select>
+
+        <label for="empDisponivel">Colaborador disponível</label>
+        <select id="empDisponivel"></select>
+
+        <div class="row">
+          <button onclick="atribuir()">Atribuir</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tabelaAtribuicoes">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Turno</th>
+              <th>PDV</th>
+              <th>Colaborador</th>
+              <th>Tipo</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="buttons">
+  <button onclick="baixarExcel('manha')">Baixar Manhã (.xlsx)</button>
+  <button onclick="baixarExcel('tarde')">Baixar Tarde (.xlsx)</button>
+</div>
+
+    </section>
+
+    <!-- FOLGAS -->
+    <section id="folgas" class="section" style="display:none;">
+      <h2>Mapa de Folgas</h2>
+
+      <div id="folgasContainer"></div>
+
+      <div style="text-align:center; margin-top:25px;">
+        <button onclick="baixarFolgasTodas()">Baixar TODOS os turnos (.xlsx)</button>
+      </div>
+    </section>
+
+    <!-- DOMINGOS -->
+    <section id="domingo" class="section" style="display:none;">
+      <h2>Controle de Domingos — Banco de Folgas</h2>
+
+      <section class="registro card">
+        <h3>Registrar / Atualizar funcionário (Domingos)</h3>
+        <div class="form-row">
+          <input id="domNome" placeholder="Nome completo (mesmo do cadastro)" />
+          <select id="domCategoria">
+            <option value="empaquetador">Empacotador</option>
+            <option value="caja">Operador de Caixa</option>
+            <option value="fiscal">Fiscal</option>
+          </select>
+          <label class="small">1º domingo trabalhado</label>
+          <input id="domPrimeiro" type="date" />
+          <button id="domBtnAdicionar">Adicionar / Atualizar</button>
+        </div>
+      </section>
+
+      <section class="controls card">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-cat="empaquetador">Empacotador</button>
+          <button class="tab" data-cat="caja">Operador de Caixa</button>
+          <button class="tab" data-cat="fiscal">Fiscal</button>
+        </div>
+
+        <div class="filtros">
+          <label>Mês:
+            <select id="domMes">
+              <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+              <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+              <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+              <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+            </select>
+          </label>
+
+          <label>Ano:
+            <input id="domAno" type="number" min="2000" max="2100" value="2025" />
+          </label>
+
+          <button id="domBtnCarregar">Carregar planilha</button>
+          <button id="domBtnExportar">Exportar Excel</button>
+        </div>
+      </section>
+
+      <section class="planilha card">
+        <h3 id="domTituloPlanilha">Planilha — Empacotador — Novembro 2025</h3>
+        <div class="table-wrap">
+          <table id="domTabelaPlanilha"></table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Gerado no navegador — dados salvos localmente (localStorage)</small>
+  </footer>
+
+  <!-- Script fusionado -->
+  <script src="script-fusionado.js"></script>
+</body>
+</html>

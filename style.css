@@ -1,0 +1,230 @@
+:root{
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --brand-blue: #1e2a78;
+  --brand-red: #e60012;
+  --border: #d0d4e4;
+  --text: #1e1e2f;
+  --radius: 12px;
+  --shadow: 0 6px 20px rgba(0,0,0,0.08);
+  --max-width: 1000px;
+}
+
+/* RESET */
+*{ box-sizing:border-box; }
+
+body{
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+}
+
+/* HEADER */
+header{
+  width:100%;
+  background: linear-gradient(90deg,var(--brand-blue), #2a3cc9);
+  padding:18px 10px;
+  color:#fff;
+  box-shadow:var(--shadow);
+}
+header .brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  justify-content:center;
+}
+header h1{ margin:0; font-size:1.6rem; letter-spacing:1px; }
+
+nav{ margin-top:10px; text-align:center; }
+
+.nav-btn{
+  background:#fff;
+  color:var(--brand-blue);
+  border:none;
+  padding:10px 16px;
+  border-radius:10px;
+  margin:0 6px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.nav-btn:hover{ transform:translateY(-3px); background:var(--brand-red); color:#fff; }
+
+/* LAYOUT */
+main{
+  width:100%;
+  max-width:var(--max-width);
+  padding:28px;
+}
+
+.section{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:26px;
+  margin:18px auto;
+  box-shadow:var(--shadow);
+}
+
+/* FORMULARIO */
+.form-card{
+  background:#f9f9fc;
+  padding:18px;
+  border-radius:10px;
+  border:1px solid var(--border);
+}
+
+label{
+  display:block;
+  margin-top:12px;
+  color:var(--brand-blue);
+  font-weight:700;
+}
+
+input, select{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:0.95rem;
+  outline:none;
+}
+
+input[readonly]{ background:#fff; cursor:pointer; }
+
+button{
+  background:var(--brand-red);
+  color:#fff;
+  border:none;
+  padding:10px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+  transition:all .18s ease;
+}
+button:hover{ transform:translateY(-3px); background:#b0000f; }
+
+button.sec{
+  background:#f0f2ff;
+  color:var(--brand-blue);
+  border:1px solid var(--brand-blue);
+}
+
+/* LISTAS */
+.split-lists{
+  display:flex;
+  gap:18px;
+}
+.split-lists>div{ flex:1; }
+
+.list{
+  list-style:none;
+  padding:0;
+  margin:12px 0;
+}
+.list li{
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:8px;
+  background:#f0f2ff;
+  border-left:6px solid var(--brand-red);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.list li small{ color:#666; font-size:0.9rem; }
+
+/* TABLA */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:14px;
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+}
+thead th{
+  background:var(--brand-blue);
+  color:#fff;
+  padding:12px;
+  text-align:left;
+}
+tbody td{
+  padding:10px;
+  border-bottom:1px solid #eef0ff;
+}
+
+/* TURNOS */
+.turno-toggle{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+.turno-btn{
+  flex:1;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--brand-blue);
+  cursor:pointer;
+  font-weight:700;
+}
+.turno-btn.active{
+  background:var(--brand-blue);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(30,42,120,0.12);
+}
+
+/* FOLGAS (AQUI ESTA TU FIX REAL) */
+.folga-wrapper{
+  display:block !important;
+  width:100% !important;
+  margin-bottom: 40px;
+}
+
+#folgasContainer{
+  display:block !important;
+  width:100% !important;
+}
+
+/* Cuadritos */
+.folgas-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:16px;
+  width:100%;
+  margin-bottom:35px;
+}
+
+.folga-card{
+  background:#ffffff;
+  border-radius: var(--radius);
+  padding:12px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+.folga-card h4{
+  margin-top:0;
+  color:var(--brand-blue);
+}
+
+.folga-card ul{
+  list-style:none;
+  margin:0;
+  padding-left:12px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .split-lists{ flex-direction:column; }
+  .folgas-grid{ grid-template-columns:1fr; }
+  main{ padding:12px; }
+}
